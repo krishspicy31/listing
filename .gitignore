@@ -1,2 +1,11 @@
 /.bmad-core
 /docs
+dev.augment-guidelines
+po.augment-guidelines
+qa.augment-guidelines
+ux.augment-guidelines
+.augment-guidelines
+/culturalite-backend/apps/events/__pycache__
+/culturalite-backend/apps/notifications/__pycache__
+/culturalite-backend/apps/users/__pycache__
+/culturalite-backend/culturalite_backend/__pycache__
