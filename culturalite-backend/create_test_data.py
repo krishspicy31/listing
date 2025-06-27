@@ -14,6 +14,7 @@ django.setup()
 
 from django.contrib.auth.models import User
 from apps.events.models import Event, Category
+from django.db import IntegrityError
 
 def create_test_data():
     """Create comprehensive test data for API testing."""
@@ -132,18 +133,25 @@ def create_test_data():
             created_events.append(existing_event)
             continue
             
-        event = Event.objects.create(
-            title=event_data['title'],
-            description=event_data['description'],
-            city=event_data['city'],
-            event_date=datetime.now(timezone.utc) + timedelta(days=event_data['days_offset']),
-            image_url=f'https://example.com/image{i+1}.jpg',
-            status=event_data['status'],
-            category=event_data['category'],
-            vendor=vendor
-        )
-        created_events.append(event)
-        print(f"Created event: {event.title} ({event.status})")
+        try:
+            event = Event.objects.create(
+                title=event_data['title'],
+                description=event_data['description'],
+                city=event_data['city'],
+                event_date=datetime.now(timezone.utc) + timedelta(days=event_data['days_offset']),
+                image_url=f'https://example.com/image{i+1}.jpg',
+                status=event_data['status'],
+                category=event_data['category'],
+                vendor=vendor
+            )
+            created_events.append(event)
+            print(f"Created event: {event.title} ({event.status})")
+        except IntegrityError as e:
+            print(f"Error creating event '{event_data['title']}': {str(e)}")
+            continue
+        except Exception as e:
+            print(f"Unexpected error creating event '{event_data['title']}': {str(e)}")
+            continue
     
     # Summary
     total_events = Event.objects.count()

@@ -9,6 +9,41 @@ from apps.events.models import Event, Category
 import uuid
 
 
+class EventFactory:
+    """Factory class for creating test events."""
+
+    @staticmethod
+    def create_event(title, description, city, event_date, status, category, vendor, image_url=None):
+        """Create a test event with the given parameters."""
+        return Event.objects.create(
+            title=title,
+            description=description,
+            city=city,
+            event_date=event_date,
+            image_url=image_url or f'https://example.com/{title.lower().replace(" ", "-")}.jpg',
+            status=status,
+            category=category,
+            vendor=vendor
+        )
+
+    @staticmethod
+    def create_bulk_events(count, base_title, city, category, vendor, status='approved'):
+        """Create multiple test events for pagination testing."""
+        events = []
+        for i in range(count):
+            event = EventFactory.create_event(
+                title=f'{base_title} {i+1}',
+                description=f'Description for {base_title} {i+1}',
+                city=city,
+                event_date=datetime(2025, 8, (i % 28) + 1, 18, 0, tzinfo=timezone.utc),
+                status=status,
+                category=category,
+                vendor=vendor
+            )
+            events.append(event)
+        return events
+
+
 class EventAPIIntegrationTestCase(TestCase):
     """
     Integration tests for the Events API.
@@ -89,7 +124,14 @@ class EventAPIIntegrationTestCase(TestCase):
                 vendor=self.vendor
             )
             self.created_events.append(event)
-    
+
+    def tearDown(self):
+        """Clean up test data after each test."""
+        # Delete all events created during the test
+        Event.objects.filter(vendor=self.vendor).delete()
+        # Delete the test vendor
+        self.vendor.delete()
+
     def test_full_api_functionality(self):
         """Test complete API functionality with real database queries."""
         response = self.client.get(self.url)
@@ -206,18 +248,17 @@ class EventAPIIntegrationTestCase(TestCase):
     
     def test_pagination_functionality(self):
         """Test pagination with larger dataset."""
-        # Create more events to test pagination
-        for i in range(25):  # Create 25 more approved events
-            Event.objects.create(
-                title=f'Test Event {i+10}',
-                description=f'Description for test event {i+10}',
-                city='TestCity',
-                event_date=datetime(2025, 8, i+1, 18, 0, tzinfo=timezone.utc),
-                image_url=f'https://example.com/test{i+10}.jpg',
-                status='approved',
-                category=self.categories[0],
-                vendor=self.vendor
-            )
+        # Create more events to test pagination using factory
+        pagination_events = EventFactory.create_bulk_events(
+            count=25,
+            base_title='Pagination Test Event',
+            city='TestCity',
+            category=self.categories[0],
+            vendor=self.vendor,
+            status='approved'
+        )
+        # Track created events for cleanup
+        self.created_events.extend(pagination_events)
         
         # Test first page
         response = self.client.get(self.url)

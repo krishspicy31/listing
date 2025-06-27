@@ -101,7 +101,6 @@ export function InlineLoadingSpinner({
       )}
       role="status"
       aria-label="Loading"
-      aria-hidden="true"
     />
   );
 }

@@ -25,15 +25,29 @@ interface EventCardProps {
  * Converts ISO 8601 date to readable format
  */
 function formatEventDate(dateString: string): string {
+  // Check for null or undefined dateString
+  if (!dateString) {
+    console.warn('formatEventDate: dateString is null or undefined');
+    return 'Date TBD';
+  }
+
   try {
     const date = new Date(dateString);
+
+    // Check if the date is valid
+    if (isNaN(date.getTime())) {
+      console.warn('formatEventDate: Invalid date string:', dateString);
+      return 'Date TBD';
+    }
+
     return date.toLocaleDateString('en-US', {
       weekday: 'short',
       year: 'numeric',
       month: 'short',
       day: 'numeric',
     });
-  } catch {
+  } catch (error) {
+    console.error('formatEventDate: Error parsing date:', dateString, error);
     return 'Date TBD';
   }
 }
@@ -42,21 +56,23 @@ function formatEventDate(dateString: string): string {
  * Truncate text to specified number of lines
  * Uses CSS for proper ellipsis handling
  */
-function TruncatedText({ 
-  text, 
+function TruncatedText({
+  text,
   maxLines = 2,
-  className 
-}: { 
-  text: string; 
+  className
+}: {
+  text: string;
   maxLines?: number;
   className?: string;
 }) {
+  // Generate dynamic line-clamp class
+  const lineClampClass = `line-clamp-${maxLines}`;
+
   return (
-    <p 
+    <p
       className={cn(
         'overflow-hidden text-ellipsis',
-        maxLines === 2 && 'line-clamp-2',
-        maxLines === 3 && 'line-clamp-3',
+        lineClampClass,
         className
       )}
       style={{

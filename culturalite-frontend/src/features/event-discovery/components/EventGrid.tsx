@@ -6,6 +6,7 @@
 'use client';
 
 import React from 'react';
+import { useRouter } from 'next/navigation';
 import { Event } from '@/types/event';
 import { EventCard } from './EventCard';
 import { cn } from '@/lib/utils';
@@ -21,13 +22,23 @@ interface EventGridProps {
   isLoading?: boolean;
   /** Error state */
   error?: string;
+  /** Optional retry handler for error state */
+  onRetry?: () => void;
+  /** Optional submit event handler for empty state */
+  onSubmitEvent?: () => void;
 }
 
 /**
  * Empty state component when no events are available
  * Follows front-end spec for user-friendly messaging
  */
-function EmptyState({ message }: { message: string }) {
+function EmptyState({
+  message,
+  onSubmitEvent
+}: {
+  message: string;
+  onSubmitEvent?: () => void;
+}) {
   return (
     <div 
       className="col-span-full flex flex-col items-center justify-center py-16 px-4 text-center"
@@ -65,11 +76,15 @@ function EmptyState({ message }: { message: string }) {
         <p className="text-sm text-gray-500 mb-3">
           Are you an event organizer?
         </p>
-        <button 
+        <button
           className="inline-flex items-center px-4 py-2 border border-orange-300 rounded-md shadow-sm text-sm font-medium text-orange-700 bg-orange-50 hover:bg-orange-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-colors"
           onClick={() => {
-            // This would navigate to the submit event page
-            console.log('Navigate to submit event');
+            if (onSubmitEvent) {
+              onSubmitEvent();
+            } else {
+              // Fallback navigation to login page for event submission
+              window.location.href = '/login';
+            }
           }}
         >
           Submit Your Event
@@ -157,12 +172,14 @@ function ErrorState({
  * - Desktop (1024px - 1440px): 3 columns
  * - Large screens (> 1440px): 4 columns
  */
-export function EventGrid({ 
-  events, 
-  className, 
+export function EventGrid({
+  events,
+  className,
   onEventClick,
   isLoading = false,
-  error 
+  error,
+  onRetry,
+  onSubmitEvent
 }: EventGridProps) {
   // Handle error state
   if (error) {
@@ -175,9 +192,9 @@ export function EventGrid({
         role="main"
         aria-label="Events grid"
       >
-        <ErrorState 
-          error={error} 
-          onRetry={() => window.location.reload()} 
+        <ErrorState
+          error={error}
+          onRetry={onRetry}
         />
       </div>
     );
@@ -194,7 +211,10 @@ export function EventGrid({
         role="main"
         aria-label="Events grid"
       >
-        <EmptyState message="No events found for this filter. Try another search!" />
+        <EmptyState
+          message="No events found for this filter. Try another search!"
+          onSubmitEvent={onSubmitEvent}
+        />
       </div>
     );
   }
@@ -213,7 +233,7 @@ export function EventGrid({
       role="main"
       aria-label={`Events grid showing ${events.length} events`}
     >
-      {events.map((event, index) => (
+      {events.map((event) => (
         <div
           key={event.id}
           className="focus-within:ring-2 focus-within:ring-orange-500 focus-within:ring-offset-2 rounded-xl"

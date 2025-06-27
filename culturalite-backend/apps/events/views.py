@@ -2,8 +2,13 @@ from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from django.db.models import Q
+from django.db import DatabaseError
+from django.core.exceptions import ValidationError
 from .models import Event
 from .serializers import EventSerializer
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class EventListAPIView(generics.ListAPIView):
@@ -53,8 +58,27 @@ class EventListAPIView(generics.ListAPIView):
             serializer = self.get_serializer(queryset, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
 
-        except Exception as e:
+        except DatabaseError as e:
+            logger.error(f"Database error in EventListAPIView: {str(e)}")
             return Response(
-                {'error': 'An error occurred while fetching events'},
+                {'error': 'Database error occurred while fetching events'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+        except ValidationError as e:
+            logger.warning(f"Validation error in EventListAPIView: {str(e)}")
+            return Response(
+                {'error': 'Invalid query parameters provided'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        except ValueError as e:
+            logger.warning(f"Value error in EventListAPIView: {str(e)}")
+            return Response(
+                {'error': 'Invalid parameter values provided'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        except Exception as e:
+            logger.error(f"Unexpected error in EventListAPIView: {str(e)}")
+            return Response(
+                {'error': 'An unexpected error occurred while fetching events'},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )

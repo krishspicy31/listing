@@ -6,6 +6,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { Event, EventListResponse } from '@/types/event';
 import { getApprovedEventsWithRetry, EventServiceError } from '@/features/event-discovery/services/eventService';
 import { EventGrid } from '@/features/event-discovery/components/EventGrid';
@@ -15,6 +16,7 @@ import { LoadingSpinner } from '@/components/shared/LoadingSpinner';
 type LoadingState = 'idle' | 'loading' | 'success' | 'error';
 
 export default function Home() {
+  const router = useRouter();
   const [events, setEvents] = useState<Event[]>([]);
   const [loadingState, setLoadingState] = useState<LoadingState>('idle');
   const [error, setError] = useState<string | null>(null);
@@ -53,11 +55,15 @@ export default function Home() {
 
   /**
    * Handle event card clicks
-   * Placeholder for future event detail navigation
+   * Navigate to event detail page or show placeholder
    */
   const handleEventClick = (event: Event) => {
-    console.log('Event clicked:', event);
-    // TODO: Navigate to event detail page when implemented
+    // For now, show an alert since event detail page is not yet implemented
+    // In the future, this would navigate to `/events/${event.id}`
+    alert(`Event Details\n\nTitle: ${event.title}\nCity: ${event.city}\nDate: ${new Date(event.event_date).toLocaleDateString()}\n\nEvent detail page coming soon!`);
+
+    // Future implementation:
+    // router.push(`/events/${event.id}`);
   };
 
   /**
@@ -65,6 +71,13 @@ export default function Home() {
    */
   const handleRetry = () => {
     fetchEvents();
+  };
+
+  /**
+   * Handle submit event navigation
+   */
+  const handleSubmitEvent = () => {
+    router.push('/login');
   };
 
   return (
@@ -136,6 +149,8 @@ export default function Home() {
           <EventGrid
             events={events}
             onEventClick={handleEventClick}
+            onRetry={handleRetry}
+            onSubmitEvent={handleSubmitEvent}
             className="animate-fade-in"
           />
         )}

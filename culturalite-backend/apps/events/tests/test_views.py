@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 from rest_framework.test import APIClient
 from rest_framework import status
 from datetime import datetime, timezone
+from dateutil import parser as date_parser
 from apps.events.models import Event, Category
 
 
@@ -87,11 +88,9 @@ class EventListAPIViewTestCase(TestCase):
         
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         
-        # Should return 2 approved events
-        if 'results' in response.data:
-            events = response.data['results']
-        else:
-            events = response.data
+        # Should return 2 approved events (API always uses pagination)
+        self.assertIn('results', response.data)
+        events = response.data['results']
             
         self.assertEqual(len(events), 2)
         
@@ -108,10 +107,9 @@ class EventListAPIViewTestCase(TestCase):
         
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         
-        if 'results' in response.data:
-            events = response.data['results']
-        else:
-            events = response.data
+        # API always uses pagination
+        self.assertIn('results', response.data)
+        events = response.data['results']
             
         self.assertGreater(len(events), 0)
         
@@ -252,16 +250,23 @@ class EventListAPIViewTestCase(TestCase):
         """Test that event_date is in ISO 8601 format."""
         response = self.client.get(self.url)
         
-        if 'results' in response.data:
-            events = response.data['results']
-        else:
-            events = response.data
+        # API always uses pagination
+        self.assertIn('results', response.data)
+        events = response.data['results']
             
         self.assertGreater(len(events), 0)
         
-        # Check that event_date is in ISO format
+        # Check that event_date is in proper ISO 8601 format
         event_date = events[0]['event_date']
         self.assertIsInstance(event_date, str)
-        # Should be in format like "2025-07-15T18:00:00.000000Z"
-        self.assertTrue(event_date.endswith('Z'))
-        self.assertIn('T', event_date)
+
+        # Validate ISO 8601 format by attempting to parse it
+        try:
+            parsed_date = date_parser.isoparse(event_date)
+            # Ensure it's timezone-aware and in UTC
+            self.assertIsNotNone(parsed_date.tzinfo)
+            # Should be in format like "2025-07-15T18:00:00.000000Z"
+            self.assertTrue(event_date.endswith('Z'))
+            self.assertIn('T', event_date)
+        except ValueError:
+            self.fail(f"event_date '{event_date}' is not in valid ISO 8601 format")

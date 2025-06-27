@@ -18,15 +18,22 @@ from apps.events.models import Event, Category
 def create_pagination_test_data():
     """Create additional events for pagination testing."""
     
-    # Get existing vendor and categories
-    vendor = User.objects.get(username='testvendor')
-    categories = {
-        'Music': Category.objects.get(name='Music'),
-        'Dance': Category.objects.get(name='Dance'),
-        'Theater': Category.objects.get(name='Theater'),
-        'Art': Category.objects.get(name='Art'),
-        'Festival': Category.objects.get(name='Festival'),
-    }
+    # Get existing vendor and categories with error handling
+    try:
+        vendor = User.objects.get(username='testvendor')
+    except User.DoesNotExist:
+        print("Error: 'testvendor' user not found. Please create the user first.")
+        return
+
+    categories = {}
+    required_categories = ['Music', 'Dance', 'Theater', 'Art', 'Festival']
+
+    for category_name in required_categories:
+        try:
+            categories[category_name] = Category.objects.get(name=category_name)
+        except Category.DoesNotExist:
+            print(f"Error: '{category_name}' category not found. Please create the category first.")
+            return
     
     cities = ['Chennai', 'Mumbai', 'Delhi', 'Bangalore', 'Kolkata', 'Hyderabad', 'Pune', 'Ahmedabad']
     category_list = list(categories.values())

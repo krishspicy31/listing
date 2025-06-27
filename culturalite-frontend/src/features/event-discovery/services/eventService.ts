@@ -3,11 +3,11 @@
  * Implements proper error handling and TypeScript typing
  */
 
-import { 
-  Event, 
-  EventListResponse, 
-  EventQueryParams, 
-  ApiError 
+import {
+  Event,
+  EventListResponse,
+  EventQueryParams,
+  ApiError
 } from '@/types/event';
 
 /**
@@ -91,8 +91,9 @@ export async function getApprovedEvents(
       let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
       
       try {
-        const errorData = await response.json() as ApiError;
-        if (errorData.error) {
+        const errorData = await response.json();
+        // Runtime validation of error response structure
+        if (errorData && typeof errorData === 'object' && typeof errorData.error === 'string') {
           errorMessage = errorData.error;
         }
       } catch {
@@ -106,20 +107,23 @@ export async function getApprovedEvents(
     }
 
     // Parse and validate response
-    const data = await response.json() as EventListResponse;
-    
-    // Basic validation of response structure
+    const data = await response.json();
+
+    // Runtime validation of response structure
     if (!data || typeof data !== 'object') {
       throw new EventServiceError('Invalid response format from server');
     }
-    
-    if (!Array.isArray(data.results)) {
-      throw new EventServiceError('Invalid events data format');
-    }
 
+    // Validate EventListResponse structure
+    if (typeof data.count !== 'number' ||
+        !Array.isArray(data.results) ||
+        (data.next !== null && typeof data.next !== 'string') ||
+        (data.previous !== null && typeof data.previous !== 'string')) {
+      throw new EventServiceError('Invalid response structure from server');
+    }
     return {
       success: true,
-      data
+      data: data as EventListResponse
     };
 
   } catch (error) {
@@ -132,7 +136,15 @@ export async function getApprovedEvents(
     }
     
     // Handle network errors, timeout, etc.
-    if (error instanceof TypeError && error.message.includes('fetch')) {
+    // Check for common network-related TypeError instances
+    if (error instanceof TypeError && (
+        error.message.includes('fetch') ||
+        error.message.includes('network') ||
+        error.message.includes('Failed to fetch') ||
+        error.message.includes('NetworkError') ||
+        error.message.includes('ERR_NETWORK') ||
+        error.message.includes('ERR_INTERNET_DISCONNECTED')
+      )) {
       return {
         success: false,
         error: new EventServiceError(
@@ -167,32 +179,37 @@ export async function getApprovedEventsWithRetry(
   params?: EventQueryParams,
   maxRetries: number = 3
 ): Promise<EventServiceResult<EventListResponse>> {
-  let lastError: EventServiceError;
-  
+  let lastError: EventServiceError | undefined;
+
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     const result = await getApprovedEvents(params);
-    
+
     if (result.success) {
       return result;
     }
-    
+
     lastError = result.error;
-    
+
     // Don't retry on client errors (4xx) or final attempt
     if (
-      attempt === maxRetries || 
+      attempt === maxRetries ||
       (result.error.statusCode && result.error.statusCode >= 400 && result.error.statusCode < 500)
     ) {
       break;
     }
-    
+
     // Exponential backoff: wait 1s, 2s, 4s between retries
     const delay = Math.pow(2, attempt) * 1000;
     await new Promise(resolve => setTimeout(resolve, delay));
   }
-  
+
+  // Ensure lastError is defined before returning
+  if (!lastError) {
+    lastError = new EventServiceError('Unknown error occurred during retry attempts');
+  }
+
   return {
     success: false,
-    error: lastError!
+    error: lastError
   };
 }
