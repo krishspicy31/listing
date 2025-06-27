@@ -2,5 +2,5 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    # Add event-related URLs here
+    path('', views.EventListAPIView.as_view(), name='event-list'),
 ]

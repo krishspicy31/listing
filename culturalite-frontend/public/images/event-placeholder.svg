@@ -1,0 +1,9 @@
+<svg width="640" height="360" viewBox="0 0 640 360" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="640" height="360" fill="#F3F4F6"/>
+  <rect x="220" y="120" width="200" height="120" rx="8" fill="#E5E7EB"/>
+  <circle cx="280" cy="160" r="20" fill="#D1D5DB"/>
+  <path d="M260 180L280 160L300 180H260Z" fill="#D1D5DB"/>
+  <text x="320" y="190" font-family="Inter, sans-serif" font-size="14" fill="#6B7280" text-anchor="middle">
+    Event Image
+  </text>
+</svg>
