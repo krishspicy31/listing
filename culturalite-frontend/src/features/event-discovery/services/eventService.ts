@@ -213,3 +213,111 @@ export async function getApprovedEventsWithRetry(
     error: lastError
   };
 }
+
+/**
+ * Fetch available cities from approved events
+ * Returns unique city names for filter dropdown
+ *
+ * @returns Promise with typed result containing city names or error
+ */
+export async function getAvailableCities(): Promise<EventServiceResult<string[]>> {
+  try {
+    const url = `${API_BASE_URL}/events/cities/`;
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      cache: 'default',
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      let errorMessage = 'Failed to fetch available cities.';
+
+      try {
+        const errorData = JSON.parse(errorText);
+        errorMessage = errorData.error || errorMessage;
+      } catch {
+        // Use default error message if response is not JSON
+      }
+
+      return {
+        success: false,
+        error: new EventServiceError(errorMessage, response.status)
+      };
+    }
+
+    const cities: string[] = await response.json();
+
+    return {
+      success: true,
+      data: cities
+    };
+  } catch (error) {
+    // Handle network errors and other unexpected errors
+    return {
+      success: false,
+      error: new EventServiceError(
+        'An unexpected error occurred while fetching cities.',
+        0,
+        error
+      )
+    };
+  }
+}
+
+/**
+ * Fetch available categories from the backend
+ * Returns all category names for filter dropdown
+ *
+ * @returns Promise with typed result containing category names or error
+ */
+export async function getAvailableCategories(): Promise<EventServiceResult<string[]>> {
+  try {
+    const url = `${API_BASE_URL}/events/categories/`;
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      cache: 'default',
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      let errorMessage = 'Failed to fetch available categories.';
+
+      try {
+        const errorData = JSON.parse(errorText);
+        errorMessage = errorData.error || errorMessage;
+      } catch {
+        // Use default error message if response is not JSON
+      }
+
+      return {
+        success: false,
+        error: new EventServiceError(errorMessage, response.status)
+      };
+    }
+
+    const categories: string[] = await response.json();
+
+    return {
+      success: true,
+      data: categories
+    };
+  } catch (error) {
+    // Handle network errors and other unexpected errors
+    return {
+      success: false,
+      error: new EventServiceError(
+        'An unexpected error occurred while fetching categories.',
+        0,
+        error
+      )
+    };
+  }
+}

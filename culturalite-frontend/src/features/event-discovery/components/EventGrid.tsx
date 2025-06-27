@@ -26,6 +26,10 @@ interface EventGridProps {
   onRetry?: () => void;
   /** Optional submit event handler for empty state */
   onSubmitEvent?: () => void;
+  /** Whether the current empty state is due to active filters */
+  hasActiveFilters?: boolean;
+  /** Handler for clearing filters when no results found */
+  onClearFilters?: () => void;
 }
 
 /**
@@ -34,10 +38,14 @@ interface EventGridProps {
  */
 function EmptyState({
   message,
-  onSubmitEvent
+  onSubmitEvent,
+  hasActiveFilters = false,
+  onClearFilters
 }: {
   message: string;
   onSubmitEvent?: () => void;
+  hasActiveFilters?: boolean;
+  onClearFilters?: () => void;
 }) {
   return (
     <div 
@@ -71,25 +79,53 @@ function EmptyState({
         {message}
       </p>
       
-      {/* Call to action for organizers */}
-      <div className="mt-6">
-        <p className="text-sm text-gray-500 mb-3">
-          Are you an event organizer?
-        </p>
-        <button
-          className="inline-flex items-center px-4 py-2 border border-orange-300 rounded-md shadow-sm text-sm font-medium text-orange-700 bg-orange-50 hover:bg-orange-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-colors"
-          onClick={() => {
-            if (onSubmitEvent) {
-              onSubmitEvent();
-            } else {
-              // Fallback navigation to login page for event submission
-              window.location.href = '/login';
-            }
-          }}
-        >
-          Submit Your Event
-        </button>
-      </div>
+      {/* Clear Filters Button (for filtered empty states) */}
+      {hasActiveFilters && onClearFilters && (
+        <div className="mt-6">
+          <button
+            className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-colors"
+            onClick={onClearFilters}
+          >
+            <svg
+              className="w-4 h-4 mr-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+            Clear Filters
+          </button>
+        </div>
+      )}
+
+      {/* Call to action for organizers (only when no active filters) */}
+      {!hasActiveFilters && (
+        <div className="mt-6">
+          <p className="text-sm text-gray-500 mb-3">
+            Are you an event organizer?
+          </p>
+          <button
+            className="inline-flex items-center px-4 py-2 border border-orange-300 rounded-md shadow-sm text-sm font-medium text-orange-700 bg-orange-50 hover:bg-orange-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-colors"
+            onClick={() => {
+              if (onSubmitEvent) {
+                onSubmitEvent();
+              } else {
+                // Fallback navigation to login page for event submission
+                window.location.href = '/login';
+              }
+            }}
+          >
+            Submit Your Event
+          </button>
+        </div>
+      )}
     </div>
   );
 }
@@ -179,7 +215,9 @@ export function EventGrid({
   isLoading = false,
   error,
   onRetry,
-  onSubmitEvent
+  onSubmitEvent,
+  hasActiveFilters = false,
+  onClearFilters
 }: EventGridProps) {
   // Handle error state
   if (error) {
@@ -202,8 +240,12 @@ export function EventGrid({
 
   // Handle empty state
   if (!isLoading && events.length === 0) {
+    const emptyMessage = hasActiveFilters
+      ? "No events found for your selected filters. Try adjusting your search criteria or clear filters to see all events."
+      : "No events are currently available. Check back soon for new cultural experiences!";
+
     return (
-      <div 
+      <div
         className={cn(
           'grid grid-cols-1',
           className
@@ -212,8 +254,10 @@ export function EventGrid({
         aria-label="Events grid"
       >
         <EmptyState
-          message="No events found for this filter. Try another search!"
+          message={emptyMessage}
           onSubmitEvent={onSubmitEvent}
+          hasActiveFilters={hasActiveFilters}
+          onClearFilters={onClearFilters}
         />
       </div>
     );

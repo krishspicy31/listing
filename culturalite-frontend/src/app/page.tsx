@@ -7,9 +7,15 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Event, EventListResponse } from '@/types/event';
-import { getApprovedEventsWithRetry, EventServiceError } from '@/features/event-discovery/services/eventService';
+import { Event, EventListResponse, EventQueryParams } from '@/types/event';
+import {
+  getApprovedEventsWithRetry,
+  getAvailableCities,
+  getAvailableCategories,
+  EventServiceError
+} from '@/features/event-discovery/services/eventService';
 import { EventGrid } from '@/features/event-discovery/components/EventGrid';
+import { EventFilters } from '@/features/event-discovery/components/EventFilters';
 import { LoadingSpinner } from '@/components/shared/LoadingSpinner';
 
 // Loading state type
@@ -21,16 +27,24 @@ export default function Home() {
   const [loadingState, setLoadingState] = useState<LoadingState>('idle');
   const [error, setError] = useState<string | null>(null);
 
+  // Filter state
+  const [selectedCity, setSelectedCity] = useState<string>('all');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [cityOptions, setCityOptions] = useState<Array<{value: string, label: string}>>([]);
+  const [categoryOptions, setCategoryOptions] = useState<Array<{value: string, label: string}>>([]);
+  const [isLoadingOptions, setIsLoadingOptions] = useState<boolean>(false);
+  const [optionsError, setOptionsError] = useState<string | null>(null);
+
   /**
-   * Fetch events from the API
+   * Fetch events from the API with optional filtering
    * Implements proper error handling and loading states
    */
-  const fetchEvents = async () => {
+  const fetchEvents = async (filters?: EventQueryParams) => {
     setLoadingState('loading');
     setError(null);
 
     try {
-      const result = await getApprovedEventsWithRetry();
+      const result = await getApprovedEventsWithRetry(filters);
 
       if (result.success) {
         setEvents(result.data.results);
@@ -46,11 +60,100 @@ export default function Home() {
   };
 
   /**
-   * Load events on component mount
+   * Fetch filter options from the API
+   * Loads available cities and categories for filter dropdowns
+   */
+  const fetchFilterOptions = async () => {
+    setIsLoadingOptions(true);
+    setOptionsError(null);
+
+    try {
+      const [citiesResult, categoriesResult] = await Promise.all([
+        getAvailableCities(),
+        getAvailableCategories()
+      ]);
+
+      if (citiesResult.success && categoriesResult.success) {
+        setCityOptions(
+          citiesResult.data.map(city => ({ value: city, label: city }))
+        );
+        setCategoryOptions(
+          categoriesResult.data.map(category => ({ value: category, label: category }))
+        );
+      } else {
+        let errorMessage = 'Failed to load filter options.';
+        if (!citiesResult.success) {
+          errorMessage = citiesResult.error.message;
+        } else if (!categoriesResult.success) {
+          errorMessage = categoriesResult.error.message;
+        }
+        setOptionsError(errorMessage);
+      }
+    } catch (err) {
+      setOptionsError('Failed to load filter options.');
+    } finally {
+      setIsLoadingOptions(false);
+    }
+  };
+
+  /**
+   * Handle filter changes and trigger new event fetch
+   * Implements 500ms response target for filter changes
+   */
+  const handleFilterChange = (newCity: string, newCategory: string) => {
+    const filters: EventQueryParams = {};
+
+    if (newCity !== 'all') {
+      filters.city = newCity;
+    }
+
+    if (newCategory !== 'all') {
+      filters.category = newCategory;
+    }
+
+    // Fetch events with new filters
+    fetchEvents(Object.keys(filters).length > 0 ? filters : undefined);
+  };
+
+  /**
+   * Handle city filter change
+   */
+  const handleCityChange = (city: string) => {
+    setSelectedCity(city);
+    handleFilterChange(city, selectedCategory);
+  };
+
+  /**
+   * Handle category filter change
+   */
+  const handleCategoryChange = (category: string) => {
+    setSelectedCategory(category);
+    handleFilterChange(selectedCity, category);
+  };
+
+  /**
+   * Clear all filters and reset to defaults
+   */
+  const handleClearFilters = () => {
+    setSelectedCity('all');
+    setSelectedCategory('all');
+    fetchEvents(); // Fetch all events without filters
+  };
+
+  /**
+   * Retry fetching filter options
+   */
+  const handleRetryOptions = () => {
+    fetchFilterOptions();
+  };
+
+  /**
+   * Load events and filter options on component mount
    * Implements the requirement for fetching data on page load
    */
   useEffect(() => {
     fetchEvents();
+    fetchFilterOptions();
   }, []);
 
   /**
@@ -98,6 +201,22 @@ export default function Home() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Event Filters */}
+        <div className="mb-8">
+          <EventFilters
+            selectedCity={selectedCity}
+            selectedCategory={selectedCategory}
+            cityOptions={cityOptions}
+            categoryOptions={categoryOptions}
+            isLoadingOptions={isLoadingOptions}
+            optionsError={optionsError || undefined}
+            onCityChange={handleCityChange}
+            onCategoryChange={handleCategoryChange}
+            onClearFilters={handleClearFilters}
+            onRetryOptions={handleRetryOptions}
+          />
+        </div>
+
         {/* Loading State */}
         {loadingState === 'loading' && (
           <div className="flex justify-center py-16">
@@ -151,6 +270,8 @@ export default function Home() {
             onEventClick={handleEventClick}
             onRetry={handleRetry}
             onSubmitEvent={handleSubmitEvent}
+            hasActiveFilters={selectedCity !== 'all' || selectedCategory !== 'all'}
+            onClearFilters={handleClearFilters}
             className="animate-fade-in"
           />
         )}
