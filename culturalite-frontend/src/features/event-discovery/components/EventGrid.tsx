@@ -6,7 +6,6 @@
 'use client';
 
 import React from 'react';
-import { useRouter } from 'next/navigation';
 import { Event } from '@/types/event';
 import { EventCard } from './EventCard';
 import { cn } from '@/lib/utils';

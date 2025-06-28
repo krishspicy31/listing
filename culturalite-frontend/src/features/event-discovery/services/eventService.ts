@@ -4,10 +4,8 @@
  */
 
 import {
-  Event,
   EventListResponse,
-  EventQueryParams,
-  ApiError
+  EventQueryParams
 } from '@/types/event';
 
 /**

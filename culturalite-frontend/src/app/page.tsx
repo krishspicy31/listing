@@ -1,22 +1,26 @@
 /**
- * Homepage component with event grid
- * Implements SSR for SEO optimization and fetches events on page load
+ * CulturaLite Homepage - Mobile-first cultural events discovery platform
+ * Features hero section, event grid, filters, and vendor CTA
  */
 
 'use client';
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Event, EventListResponse, EventQueryParams } from '@/types/event';
+import { motion } from 'framer-motion';
+import { Event, EventQueryParams } from '@/types/event';
 import {
   getApprovedEventsWithRetry,
   getAvailableCities,
-  getAvailableCategories,
-  EventServiceError
+  getAvailableCategories
 } from '@/features/event-discovery/services/eventService';
 import { EventGrid } from '@/features/event-discovery/components/EventGrid';
 import { EventFilters } from '@/features/event-discovery/components/EventFilters';
 import { LoadingSpinner } from '@/components/shared/LoadingSpinner';
+import { Header } from '@/components/layout/Header';
+import { Footer } from '@/components/layout/Footer';
+import { HeroSection } from '@/components/sections/HeroSection';
+import { CTABanner } from '@/components/sections/CTABanner';
 
 // Loading state type
 type LoadingState = 'idle' | 'loading' | 'success' | 'error';
@@ -34,6 +38,22 @@ export default function Home() {
   const [categoryOptions, setCategoryOptions] = useState<Array<{value: string, label: string}>>([]);
   const [isLoadingOptions, setIsLoadingOptions] = useState<boolean>(false);
   const [optionsError, setOptionsError] = useState<string | null>(null);
+
+  // Reduced motion preference detection
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+
+  // Check for reduced motion preference
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setPrefersReducedMotion(mediaQuery.matches);
+
+    const handleChange = (e: MediaQueryListEvent) => {
+      setPrefersReducedMotion(e.matches);
+    };
+
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
+  }, []);
 
   /**
    * Fetch events from the API with optional filtering
@@ -53,8 +73,12 @@ export default function Home() {
         setError(result.error.message);
         setLoadingState('error');
       }
-    } catch (err) {
-      setError('An unexpected error occurred while loading events.');
+    } catch (error) {
+      console.error('Error fetching events:', error);
+      const errorMessage = error instanceof Error
+        ? `Failed to load events: ${error.message}`
+        : 'An unexpected error occurred while loading events.';
+      setError(errorMessage);
       setLoadingState('error');
     }
   };
@@ -89,8 +113,12 @@ export default function Home() {
         }
         setOptionsError(errorMessage);
       }
-    } catch (err) {
-      setOptionsError('Failed to load filter options.');
+    } catch (error) {
+      console.error('Error fetching filter options:', error);
+      const errorMessage = error instanceof Error
+        ? `Failed to load filter options: ${error.message}`
+        : 'Failed to load filter options.';
+      setOptionsError(errorMessage);
     } finally {
       setIsLoadingOptions(false);
     }
@@ -184,25 +212,49 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header Section */}
-      <header className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="text-center">
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">
-              Discover Cultural Events
-            </h1>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Find amazing cultural experiences happening in your city. From music and dance to festivals and art exhibitions.
-            </p>
-          </div>
-        </div>
-      </header>
+    <div className="min-h-screen bg-white">
+      {/* Header */}
+      <Header />
+
+      {/* Hero Section */}
+      <HeroSection onStartBrowsing={() => {
+        try {
+          const eventsSection = document.getElementById('events-section');
+          if (eventsSection) {
+            eventsSection.scrollIntoView({ behavior: 'smooth' });
+          } else {
+            console.warn('Events section element not found for smooth scroll');
+          }
+        } catch (error) {
+          console.error('Error during smooth scroll:', error);
+        }
+      }} />
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Event Filters */}
-        <div className="mb-8">
+      <main id="events-section" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Section Title */}
+        <motion.div
+          className="text-center mb-12"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          viewport={{ once: true }}
+        >
+          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+            Happening Now
+          </h2>
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            Discover amazing cultural experiences in your city
+          </p>
+        </motion.div>
+        {/* Event Filters - Sticky on scroll */}
+        <motion.div
+          className="sticky top-16 lg:top-20 z-40 bg-white/95 backdrop-blur-sm border-b border-gray-200 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 py-4 mb-8"
+          initial={{ opacity: 0, y: -20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          viewport={{ once: true }}
+        >
           <EventFilters
             selectedCity={selectedCity}
             selectedCategory={selectedCategory}
@@ -215,24 +267,39 @@ export default function Home() {
             onClearFilters={handleClearFilters}
             onRetryOptions={handleRetryOptions}
           />
-        </div>
+        </motion.div>
 
         {/* Loading State */}
         {loadingState === 'loading' && (
-          <div className="flex justify-center py-16">
+          <motion.div
+            className="flex justify-center py-16"
+            initial={prefersReducedMotion ? { opacity: 1 } : { opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.3 }}
+          >
             <LoadingSpinner
               size="lg"
               message="Loading cultural events..."
               showText={true}
             />
-          </div>
+          </motion.div>
         )}
 
         {/* Error State */}
         {loadingState === 'error' && (
-          <div className="text-center py-16">
+          <motion.div
+            className="text-center py-16"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
             <div className="max-w-md mx-auto">
-              <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-red-100 flex items-center justify-center">
+              <motion.div
+                className="w-16 h-16 mx-auto mb-6 rounded-full bg-red-100 flex items-center justify-center"
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ duration: 0.3, delay: 0.2 }}
+              >
                 <svg
                   className="w-8 h-8 text-red-500"
                   fill="none"
@@ -246,45 +313,50 @@ export default function Home() {
                     d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
                   />
                 </svg>
-              </div>
+              </motion.div>
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
                 Unable to Load Events
               </h3>
               <p className="text-gray-600 mb-6">
                 {error}
               </p>
-              <button
+              <motion.button
                 className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-colors"
                 onClick={handleRetry}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
               >
                 Try Again
-              </button>
+              </motion.button>
             </div>
-          </div>
+          </motion.div>
         )}
 
         {/* Events Grid */}
         {loadingState === 'success' && (
-          <EventGrid
-            events={events}
-            onEventClick={handleEventClick}
-            onRetry={handleRetry}
-            onSubmitEvent={handleSubmitEvent}
-            hasActiveFilters={selectedCity !== 'all' || selectedCategory !== 'all'}
-            onClearFilters={handleClearFilters}
-            className="animate-fade-in"
-          />
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <EventGrid
+              events={events}
+              onEventClick={handleEventClick}
+              onRetry={handleRetry}
+              onSubmitEvent={handleSubmitEvent}
+              hasActiveFilters={selectedCity !== 'all' || selectedCategory !== 'all'}
+              onClearFilters={handleClearFilters}
+              className="animate-fade-in"
+            />
+          </motion.div>
         )}
       </main>
 
+      {/* CTA Banner for Vendors */}
+      <CTABanner onSubmitEvent={handleSubmitEvent} className="mt-16" />
+
       {/* Footer */}
-      <footer className="bg-white border-t border-gray-200 mt-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="text-center text-gray-500">
-            <p>© 2025 Culturalite. Connecting you with cultural experiences.</p>
-          </div>
-        </div>
-      </footer>
+      <Footer className="mt-16" />
     </div>
   );
 }

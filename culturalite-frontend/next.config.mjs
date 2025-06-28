@@ -30,6 +30,13 @@ const nextConfig = {
         port: '',
         pathname: '/**',
       },
+      // Example.com for test/mock data
+      {
+        protocol: 'https',
+        hostname: 'example.com',
+        port: '',
+        pathname: '/**',
+      },
     ],
   },
 };

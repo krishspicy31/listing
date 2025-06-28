@@ -126,9 +126,9 @@ export function EventCard({ event, className, onClick }: EventCardProps) {
   return (
     <Card
       className={cn(
-        'group cursor-pointer transition-all duration-200 hover:shadow-lg hover:scale-[1.02]',
+        'group cursor-pointer transition-all duration-200 hover:shadow-xl hover:scale-[1.02] hover:-translate-y-1',
         'focus-within:ring-2 focus-within:ring-orange-500 focus-within:ring-offset-2',
-        'bg-white border border-gray-200 rounded-xl overflow-hidden',
+        'bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm',
         className
       )}
       onClick={handleClick}
@@ -162,8 +162,8 @@ export function EventCard({ event, className, onClick }: EventCardProps) {
           
           {/* Category Badge */}
           <div className="absolute top-3 left-3">
-            <span 
-              className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800 border border-orange-200"
+            <span
+              className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200 shadow-sm"
               aria-label={`Category: ${event.category.name}`}
             >
               {event.category.name}
