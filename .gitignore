@@ -9,3 +9,4 @@ ux.augment-guidelines
 /culturalite-backend/apps/notifications/__pycache__
 /culturalite-backend/apps/users/__pycache__
 /culturalite-backend/culturalite_backend/__pycache__
+node_modules
