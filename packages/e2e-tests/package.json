@@ -12,9 +12,11 @@
     "test:debug": "playwright test --debug",
     "test:ui": "playwright test --ui",
     "test:report": "playwright show-report",
-    "install": "playwright install",
+    "install:browsers": "playwright install",
     "install:deps": "playwright install-deps",
-    "clean": "rm -rf test-results playwright-report"
+    "setup": "npm run install:browsers",
+    "clean": "rm -rf test-results playwright-report",
+    "build": "echo 'E2E tests do not require building'"
   },
   "keywords": [
     "playwright",

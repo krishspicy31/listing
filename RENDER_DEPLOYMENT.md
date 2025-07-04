@@ -30,7 +30,7 @@ This guide will help you deploy the Culturalite application on Render using the 
 
 1. **Create Web Service:**
    - Environment: `Node`
-   - Build Command: `npm install && npm run build:frontend` (uses Turborepo)
+   - Build Command: `npm install --ignore-scripts && npm run setup:backend && npm run build:frontend` (uses Turborepo)
    - Start Command: `npm run start:frontend` (uses Turborepo)
 
 2. **Environment Variables:**
@@ -109,8 +109,20 @@ The backend is configured to accept requests from:
    ```
    **Solution**: The settings.py now includes a fallback SECRET_KEY for build time. If you still see this error, ensure you're using the updated settings.py file.
 
-2. **Build Failures:**
-   - Check that all dependencies are listed in requirements.txt
+2. **STATIC_ROOT Error During Build:**
+   ```
+   ImproperlyConfigured: You're using the staticfiles app without having set the STATIC_ROOT setting
+   ```
+   **Solution**: The settings.py now includes proper STATIC_ROOT configuration. Ensure you're using the updated settings.py file.
+
+3. **Playwright Installation Error:**
+   ```
+   sh: 1: playwright: not found
+   ```
+   **Solution**: The build command uses `--ignore-scripts` to prevent Playwright from installing during frontend builds. E2E tests should be set up separately.
+
+4. **Build Failures:**
+   - Check that all dependencies are listed in requirements.txt (including `dj-database-url`)
    - Verify Python version compatibility
    - Ensure environment variables are set
 

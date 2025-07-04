@@ -92,8 +92,18 @@ WSGI_APPLICATION = 'culturalite_backend.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-# Use SQLite for development, PostgreSQL for production
-if config('USE_POSTGRESQL', default=False, cast=bool):
+import dj_database_url
+
+# Database configuration with support for DATABASE_URL (Render, Heroku, etc.)
+DATABASE_URL = config('DATABASE_URL', default=None)
+
+if DATABASE_URL:
+    # Use DATABASE_URL if provided (production environments like Render)
+    DATABASES = {
+        'default': dj_database_url.parse(DATABASE_URL)
+    }
+elif config('USE_POSTGRESQL', default=False, cast=bool):
+    # Manual PostgreSQL configuration
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
@@ -108,6 +118,7 @@ if config('USE_POSTGRESQL', default=False, cast=bool):
         }
     }
 else:
+    # SQLite for development
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
@@ -150,7 +161,17 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# Additional static files directories (if you have any)
+STATICFILES_DIRS = [
+    # BASE_DIR / 'static',  # Uncomment if you have a static directory
+]
+
+# Media files (user uploads)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
