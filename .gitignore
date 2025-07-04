@@ -65,6 +65,7 @@ Thumbs.db
 
 # Deployment
 .vercel
+.railway
 
 # Project specific
 /.bmad-core

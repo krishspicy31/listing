@@ -218,13 +218,30 @@ The frontend is configured to deploy on Vercel with Turborepo support:
 - **Install Command**: `npm install` (automatically installs Python dependencies via postinstall)
 - **Ignore Command**: Only deploys when frontend files change
 
-### Backend (Render/Railway/etc.)
+### Backend (Railway)
 
-For backend deployment, use the production build script:
+The backend is configured for Railway deployment with automatic PostgreSQL setup:
 
+**Quick Deploy:**
+[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/new/template/django)
+
+**Manual Deploy:**
 ```bash
-npm run build:production --workspace=backend
+railway login
+railway link
+railway add postgresql
+railway up
 ```
+
+**Environment Variables:**
+```bash
+SECRET_KEY=your-secret-key
+DEBUG=False
+ALLOWED_HOSTS=your-app.railway.app
+CORS_ALLOWED_ORIGINS=https://your-frontend.vercel.app
+```
+
+See [RAILWAY_DEPLOYMENT.md](./RAILWAY_DEPLOYMENT.md) for detailed instructions.
 
 ### Database
 

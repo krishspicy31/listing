@@ -239,3 +239,37 @@ CORS_ALLOWED_ORIGIN_REGEXES = config(
 )
 
 CORS_ALLOW_CREDENTIALS = True
+
+# Railway.app specific configuration
+if 'RAILWAY_ENVIRONMENT' in os.environ:
+    # Railway automatically provides these environment variables
+    ALLOWED_HOSTS.extend([
+        '.railway.app',
+        '.up.railway.app',
+        config('RAILWAY_PUBLIC_DOMAIN', default=''),
+    ])
+
+    # Railway provides DATABASE_URL for PostgreSQL
+    if 'DATABASE_URL' in os.environ:
+        import dj_database_url
+        DATABASES['default'] = dj_database_url.parse(os.environ['DATABASE_URL'])
+
+    # Force HTTPS in production
+    SECURE_SSL_REDIRECT = True
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+    # Security settings for production
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    X_FRAME_OPTIONS = 'DENY'
+
+    # Static files configuration for Railway
+    STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+    # Add Railway domains to CORS
+    CORS_ALLOWED_ORIGINS.extend([
+        f"https://{config('RAILWAY_PUBLIC_DOMAIN', default='')}",
+    ])
+
+# Health check endpoint (required for Railway health checks)
+HEALTH_CHECK_URL = '/api/health/'
