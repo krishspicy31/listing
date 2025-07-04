@@ -30,8 +30,8 @@ This guide will help you deploy the Culturalite application on Render using the 
 
 1. **Create Web Service:**
    - Environment: `Node`
-   - Build Command: `npm install && npm run build:frontend`
-   - Start Command: `npm run start --workspace=frontend`
+   - Build Command: `npm install && npm run build:frontend` (uses Turborepo)
+   - Start Command: `npm run start:frontend` (uses Turborepo)
 
 2. **Environment Variables:**
    ```
@@ -44,8 +44,8 @@ This guide will help you deploy the Culturalite application on Render using the 
 
 1. **Create Web Service:**
    - Environment: `Python 3`
-   - Build Command: `cd apps/backend && pip install -r requirements.txt && python manage.py migrate && python manage.py collectstatic --noinput`
-   - Start Command: `cd apps/backend && gunicorn culturalite_backend.wsgi:application --bind 0.0.0.0:$PORT`
+   - Build Command: `npm install && npm run build:backend` (uses Turborepo)
+   - Start Command: `npm run start:backend` (uses Turborepo)
 
 2. **Environment Variables:**
    ```

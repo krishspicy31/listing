@@ -26,7 +26,7 @@
     "dev:frontend": "turbo dev --filter=frontend",
     "dev:backend": "turbo dev --filter=backend",
     "build:frontend": "turbo build --filter=frontend",
-    "build:backend": "turbo build --filter=backend",
+    "build:backend": "npm run setup:backend && turbo build --filter=backend",
     "test:frontend": "turbo test --filter=frontend",
     "test:backend": "turbo test --filter=backend",
     "test:e2e:only": "turbo test --filter=e2e-tests",

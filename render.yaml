@@ -5,7 +5,7 @@ services:
     env: node
     plan: free
     buildCommand: npm install && npm run build:frontend
-    startCommand: npm run start --workspace=frontend
+    startCommand: npm run start:frontend
     envVars:
       - key: NODE_ENV
         value: production
@@ -16,13 +16,13 @@ services:
     domains:
       - culturalite-frontend.onrender.com
 
-  # Backend Service  
+  # Backend Service
   - type: web
     name: culturalite-backend
     env: python
     plan: free
-    buildCommand: cd apps/backend && pip install -r requirements.txt && python manage.py migrate && python manage.py collectstatic --noinput
-    startCommand: cd apps/backend && gunicorn culturalite_backend.wsgi:application --bind 0.0.0.0:$PORT
+    buildCommand: npm install && npm run build:backend
+    startCommand: npm run start:backend
     envVars:
       - key: PYTHON_VERSION
         value: 3.12.0
