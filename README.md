@@ -209,52 +209,27 @@ npm run test:ui
 
 ## Deployment
 
-### Full-Stack Deployment on Vercel
+### Frontend (Vercel)
 
-This project is configured for full-stack deployment on Vercel, running both the Next.js frontend and Django backend:
+The frontend is configured to deploy on Vercel with Turborepo support:
 
-#### Architecture
-- **Frontend**: Next.js app served from `/`
-- **Backend**: Django API served from `/api/*`
-- **Database**: SQLite (development) or PostgreSQL (production)
+- **Build Command**: `turbo build --filter=frontend` (configured in `vercel.json`)
+- **Output Directory**: `apps/frontend/.next`
+- **Install Command**: `npm install` (automatically installs Python dependencies via postinstall)
+- **Ignore Command**: Only deploys when frontend files change
 
-#### Configuration Files
-- `vercel.json`: Deployment configuration
-- `requirements.txt`: Python dependencies for Vercel
-- `apps/backend/vercel_app.py`: WSGI entry point
-- `apps/backend/culturalite_backend/vercel_settings.py`: Production settings
+### Backend (Render/Railway/etc.)
 
-#### Environment Variables (Set in Vercel Dashboard)
+For backend deployment, use the production build script:
+
 ```bash
-SECRET_KEY=your-secret-key-here
-DEBUG=False
-ALLOWED_HOSTS=your-domain.vercel.app
-```
-
-#### API Routes
-- Frontend: `https://your-app.vercel.app/`
-- Backend API: `https://your-app.vercel.app/api/`
-
-### Alternative: Separate Deployments
-
-If you prefer to deploy separately:
-
-#### Frontend Only (Vercel)
-```bash
-# Update vercel.json to only build frontend
-turbo build --filter=frontend
-```
-
-#### Backend Only (Railway/Render)
-```bash
-# Deploy backend separately
 npm run build:production --workspace=backend
 ```
 
-### Database Options
+### Database
 
 - **Development**: SQLite (included)
-- **Production**: PostgreSQL (Neon, Supabase, PlanetScale)
+- **Production**: PostgreSQL (Neon, Supabase, etc.)
 
 ## Environment Setup
 

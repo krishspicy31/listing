@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "dev": "python3 manage.py runserver",
-    "build": "python3 manage.py collectstatic --noinput --settings=culturalite_backend.vercel_settings",
+    "build": "echo 'Backend build skipped - not needed for frontend deployment'",
     "build:production": "python3 manage.py collectstatic --noinput",
     "test": "python3 manage.py test tests",
     "test:coverage": "coverage run --source='.' manage.py test tests && coverage report",
