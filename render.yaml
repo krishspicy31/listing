@@ -4,7 +4,7 @@ services:
     name: culturalite-frontend
     env: node
     plan: free
-    buildCommand: npm install --ignore-scripts && npm run setup:backend && npm run build:frontend
+    buildCommand: npm install --ignore-scripts && npm run build:frontend
     startCommand: npm run start:frontend
     envVars:
       - key: NODE_ENV
@@ -21,7 +21,7 @@ services:
     name: culturalite-backend
     env: python
     plan: free
-    buildCommand: npm install && npm run build:backend
+    buildCommand: npm install --ignore-scripts && npm run setup:backend && npm run build:backend
     startCommand: npm run start:backend
     envVars:
       - key: PYTHON_VERSION

@@ -29,11 +29,12 @@ culturalite/
 
 ### Installation
 
-1. **Clone and install all dependencies:**
+1. **Clone and install dependencies:**
 ```bash
 git clone <repository-url>
 cd culturalite
-npm install  # This automatically installs both Node.js and Python dependencies
+npm install  # Installs Node.js dependencies
+npm run setup:backend  # Installs Python dependencies for backend
 ```
 
 2. **Configure environment files:**
@@ -56,7 +57,7 @@ python3 manage.py migrate
 cd ../..
 ```
 
-> **Note:** The `npm install` command automatically runs `postinstall` which installs Python dependencies for the backend using `pip3 install -r requirements.txt`.
+> **Note:** Run `npm run setup:backend` to install Python dependencies for the Django backend when needed.
 
 ### Development
 
