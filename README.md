@@ -46,10 +46,15 @@ cd ../..
 3. **Set up the backend:**
 ```bash
 cd apps/backend
-pip install -r requirements.txt
-cp .env.template .env  # Configure your environment
-python manage.py migrate
+pip3 install -r requirements.txt
+cp .env.template .env  # Configure your environment (if template exists)
+python3 manage.py migrate
 cd ../..
+```
+
+**Alternative: Using npm script:**
+```bash
+npm run setup --workspace=backend
 ```
 
 ### Development

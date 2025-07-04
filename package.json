@@ -18,6 +18,8 @@
     "lint:fix": "turbo lint:fix",
     "type-check": "turbo type-check",
     "clean": "turbo clean",
+    "setup": "npm install && npm run setup:backend",
+    "setup:backend": "cd apps/backend && pip3 install -r requirements.txt",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md}\"",
     "dev:frontend": "turbo dev --filter=frontend",
