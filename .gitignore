@@ -1,3 +1,69 @@
+# Turborepo
+.turbo
+
+# Dependencies
+node_modules/
+*/node_modules/
+
+# Build outputs
+.next/
+dist/
+build/
+out/
+
+# Environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.coverage
+htmlcov/
+.pytest_cache/
+
+# Django
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+media/
+staticfiles/
+
+# Testing
+coverage/
+test-results/
+playwright-report/
+.nyc_output
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Project specific
 /.bmad-core
 /docs
 dev.augment-guidelines
@@ -5,8 +71,11 @@ po.augment-guidelines
 qa.augment-guidelines
 ux.augment-guidelines
 .augment-guidelines
-/culturalite-backend/apps/events/__pycache__
-/culturalite-backend/apps/notifications/__pycache__
-/culturalite-backend/apps/users/__pycache__
-/culturalite-backend/culturalite_backend/__pycache__
-node_modules
+sm.augment-guidelines
+e2e.augment-guidelines
+
+# Updated paths for new structure
+/apps/backend/apps/events/__pycache__
+/apps/backend/apps/notifications/__pycache__
+/apps/backend/apps/users/__pycache__
+/apps/backend/culturalite_backend/__pycache__

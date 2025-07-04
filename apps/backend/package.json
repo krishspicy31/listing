@@ -1,0 +1,27 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "Django backend API for Culturalite platform",
+  "private": true,
+  "scripts": {
+    "dev": "python manage.py runserver",
+    "build": "python manage.py collectstatic --noinput",
+    "test": "python manage.py test tests",
+    "test:coverage": "coverage run --source='.' manage.py test tests && coverage report",
+    "lint": "flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics",
+    "lint:fix": "black . && isort .",
+    "migrate": "python manage.py migrate",
+    "makemigrations": "python manage.py makemigrations",
+    "createsuperuser": "python manage.py createsuperuser",
+    "clean": "find . -name '*.pyc' -delete && find . -name '__pycache__' -type d -exec rm -rf {} + || true"
+  },
+  "keywords": [
+    "django",
+    "rest-framework",
+    "api",
+    "backend",
+    "culturalite"
+  ],
+  "author": "Culturalite Development Team",
+  "license": "MIT"
+}

@@ -1,43 +1,75 @@
 # Culturalite
 
-A platform connecting people with cultural events and experiences. Built with Next.js frontend and Django backend in a monorepo structure.
+A platform connecting people with cultural events and experiences. Built with Next.js frontend and Django backend in a Turborepo monorepo structure.
 
 ## Project Structure
 
-This monorepo contains both frontend and backend applications:
+This Turborepo monorepo contains frontend, backend, and testing applications:
 
 ```
 culturalite/
-├── culturalite-frontend/   # Next.js 14 frontend application
-├── culturalite-backend/    # Django 5.0 backend API
-├── docs/                   # Project documentation
-└── .bmad-core/            # Agent configuration
+├── apps/
+│   ├── frontend/          # Next.js 14 frontend application
+│   └── backend/           # Django 5.0 backend API
+├── packages/
+│   └── e2e-tests/         # Playwright end-to-end tests
+├── src/                   # Shared types and utilities
+├── docs/                  # Project documentation
+├── turbo.json            # Turborepo configuration
+└── package.json          # Root workspace configuration
 ```
 
 ## Quick Start
 
-### Frontend (Next.js)
+### Prerequisites
 
+- Node.js 18+ and npm 8+
+- Python 3.8+
+- Git
+
+### Installation
+
+1. **Clone and install dependencies:**
 ```bash
-cd culturalite-frontend
+git clone <repository-url>
+cd culturalite
 npm install
-cp .env.local.template .env.local
+```
+
+2. **Set up the frontend:**
+```bash
+cd apps/frontend
+cp .env.local.template .env.local  # Configure your environment
+cd ../..
+```
+
+3. **Set up the backend:**
+```bash
+cd apps/backend
+pip install -r requirements.txt
+cp .env.template .env  # Configure your environment
+python manage.py migrate
+cd ../..
+```
+
+### Development
+
+**Start all applications in development mode:**
+```bash
 npm run dev
 ```
 
-Frontend will be available at: http://localhost:3000
-
-### Backend (Django)
-
+**Or start individual applications:**
 ```bash
-cd culturalite-backend
-pip install -r requirements.txt
-cp .env.template .env
-python manage.py migrate
-python manage.py runserver
+# Frontend only
+npm run dev:frontend
+
+# Backend only
+npm run dev:backend
 ```
 
-Backend API will be available at: http://127.0.0.1:8000
+- Frontend: http://localhost:3000
+- Backend API: http://127.0.0.1:8000
 
 ## Tech Stack
 
@@ -55,27 +87,118 @@ Backend API will be available at: http://127.0.0.1:8000
 - JWT Authentication
 - Django TestCase
 
-## Development
+## Turborepo Commands
 
-Both applications can run simultaneously:
+This project uses [Turborepo](https://turbo.build/) for efficient monorepo management with caching and parallel execution.
 
-1. Start the backend server on port 8000
-2. Start the frontend server on port 3000
-3. Frontend will communicate with backend via API calls
+### Common Commands
+
+```bash
+# Build all packages
+npm run build
+
+# Run all packages in development mode
+npm run dev
+
+# Run tests across all packages
+npm run test
+
+# Run linting across all packages
+npm run lint
+
+# Clean all build artifacts
+npm run clean
+```
+
+### Filtered Commands
+
+Run commands for specific packages using Turborepo filters:
+
+```bash
+# Frontend specific
+npm run build:frontend
+npm run dev:frontend
+npm run test:frontend
+
+# Backend specific
+npm run build:backend
+npm run dev:backend
+npm run test:backend
+
+# E2E tests only
+npm run test:e2e:only
+```
+
+### Advanced Turborepo Usage
+
+```bash
+# Run with verbose output
+npx turbo build --verbose
+
+# Force rebuild (ignore cache)
+npx turbo build --force
+
+# Run in parallel with custom concurrency
+npx turbo test --concurrency=4
+
+# Generate dependency graph
+npx turbo build --graph
+
+# Run only changed packages
+npx turbo build --filter="[HEAD^1]"
+```
+
+### Caching
+
+Turborepo automatically caches build outputs and test results. The cache is stored in `.turbo/` and significantly speeds up subsequent runs.
+
+## Development Workflow
+
+1. **Start development servers:**
+   ```bash
+   npm run dev
+   ```
+
+2. **Make changes** to any package
+
+3. **Run tests:**
+   ```bash
+   npm run test
+   ```
+
+4. **Build for production:**
+   ```bash
+   npm run build
+   ```
 
 ## Testing
 
+### Run All Tests
+```bash
+npm run test
+```
+
 ### Frontend Tests
 ```bash
-cd culturalite-frontend
-npm test
-npm run test:coverage
+npm run test:frontend
+# Or with coverage
+npm run test:coverage --filter=frontend
 ```
 
 ### Backend Tests
 ```bash
-cd culturalite-backend
+npm run test:backend
+# Or directly in the backend directory
+cd apps/backend
 python manage.py test tests
+```
+
+### E2E Tests
+```bash
+npm run test:e2e:only
+# Or with UI mode
+cd packages/e2e-tests
+npm run test:ui
 ```
 
 ## Deployment

@@ -1,33 +1,54 @@
 {
-  "name": "culturalite-playwright-tests",
+  "name": "culturalite-monorepo",
   "version": "1.0.0",
-  "description": "Playwright tests for Culturalite Story 1.3 - Public API for Approved Events",
+  "description": "Culturalite platform - A monorepo containing frontend, backend, and testing packages",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
-    "test": "playwright test",
-    "test:api": "playwright test tests/api/",
-    "test:integration": "playwright test tests/integration/",
-    "test:headed": "playwright test --headed",
-    "test:debug": "playwright test --debug",
-    "test:report": "playwright show-report",
-    "test:ui": "playwright test --ui",
-    "install-browsers": "playwright install",
-    "install-deps": "playwright install-deps"
+    "build": "turbo build",
+    "dev": "turbo dev",
+    "test": "turbo test",
+    "test:watch": "turbo test:watch",
+    "test:coverage": "turbo test:coverage",
+    "test:e2e": "turbo test:e2e",
+    "lint": "turbo lint",
+    "lint:fix": "turbo lint:fix",
+    "type-check": "turbo type-check",
+    "clean": "turbo clean",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md}\"",
+    "dev:frontend": "turbo dev --filter=frontend",
+    "dev:backend": "turbo dev --filter=backend",
+    "build:frontend": "turbo build --filter=frontend",
+    "build:backend": "turbo build --filter=backend",
+    "test:frontend": "turbo test --filter=frontend",
+    "test:backend": "turbo test --filter=backend",
+    "test:e2e:only": "turbo test --filter=e2e-tests"
   },
   "keywords": [
-    "playwright",
-    "testing",
-    "api-testing",
+    "monorepo",
+    "turborepo",
     "culturalite",
+    "nextjs",
     "django",
+    "typescript",
+    "react",
     "rest-api"
   ],
-  "author": "Test Engineer - Alex",
+  "author": "Culturalite Development Team",
   "license": "MIT",
   "devDependencies": {
     "@types/node": "^20.0.0",
+    "prettier": "^3.0.0",
+    "turbo": "^2.5.4",
     "typescript": "^5.0.0"
   },
   "engines": {
-    "node": ">=18.0.0"
-  }
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "packageManager": "npm@10.0.0"
 }

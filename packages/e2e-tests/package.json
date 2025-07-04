@@ -1,0 +1,35 @@
+{
+  "name": "e2e-tests",
+  "version": "1.0.0",
+  "description": "End-to-end tests for Culturalite platform using Playwright",
+  "private": true,
+  "main": "playwright.config.js",
+  "scripts": {
+    "test": "playwright test",
+    "test:api": "playwright test --project='API Tests'",
+    "test:browser": "playwright test --project='Chrome Browser Tests'",
+    "test:headed": "playwright test --headed",
+    "test:debug": "playwright test --debug",
+    "test:ui": "playwright test --ui",
+    "test:report": "playwright show-report",
+    "install": "playwright install",
+    "install:deps": "playwright install-deps",
+    "clean": "rm -rf test-results playwright-report"
+  },
+  "keywords": [
+    "playwright",
+    "testing",
+    "api",
+    "events",
+    "django",
+    "rest-framework"
+  ],
+  "author": "Development Team",
+  "license": "MIT",
+  "devDependencies": {
+    "@playwright/test": "^1.40.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
