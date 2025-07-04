@@ -7,8 +7,6 @@
     "dev": "python3 manage.py runserver",
     "build": "echo 'Backend build skipped - not needed for frontend deployment'",
     "build:production": "python3 manage.py collectstatic --noinput",
-    "build:railway": "python3 manage.py collectstatic --noinput",
-    "start": "python3 manage.py migrate && gunicorn culturalite_backend.wsgi:application --bind 0.0.0.0:$PORT",
     "test": "python3 manage.py test tests",
     "test:coverage": "coverage run --source='.' manage.py test tests && coverage report",
     "lint": "flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics",
@@ -17,8 +15,6 @@
     "makemigrations": "python3 manage.py makemigrations",
     "createsuperuser": "python3 manage.py createsuperuser",
     "setup": "pip3 install -r requirements.txt",
-    "deploy:railway": "railway up",
-    "logs:railway": "railway logs",
     "clean": "find . -name '*.pyc' -delete && find . -name '__pycache__' -type d -exec rm -rf {} + || true"
   },
   "keywords": [
