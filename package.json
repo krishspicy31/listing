@@ -29,7 +29,10 @@
     "build:backend": "turbo build --filter=backend",
     "test:frontend": "turbo test --filter=frontend",
     "test:backend": "turbo test --filter=backend",
-    "test:e2e:only": "turbo test --filter=e2e-tests"
+    "test:e2e:only": "turbo test --filter=e2e-tests",
+    "start": "turbo start",
+    "start:frontend": "turbo start --filter=frontend",
+    "start:backend": "turbo start --filter=backend"
   },
   "keywords": [
     "monorepo",

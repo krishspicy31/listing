@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: culturalite-frontend
+    env: node
+    plan: free
+    buildCommand: npm install && npm run build:frontend
+    startCommand: npm run start --workspace=frontend
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NEXT_TELEMETRY_DISABLED
+        value: 1
+    domains:
+      - culturalite-frontend.onrender.com
