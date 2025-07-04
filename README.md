@@ -29,33 +29,34 @@ culturalite/
 
 ### Installation
 
-1. **Clone and install dependencies:**
+1. **Clone and install all dependencies:**
 ```bash
 git clone <repository-url>
 cd culturalite
-npm install
+npm install  # This automatically installs both Node.js and Python dependencies
 ```
 
-2. **Set up the frontend:**
+2. **Configure environment files:**
 ```bash
+# Frontend environment (if template exists)
 cd apps/frontend
-cp .env.local.template .env.local  # Configure your environment
+cp .env.local.template .env.local
+cd ../..
+
+# Backend environment (if template exists)
+cd apps/backend
+cp .env.template .env
 cd ../..
 ```
 
-3. **Set up the backend:**
+3. **Run initial database migration:**
 ```bash
 cd apps/backend
-pip3 install -r requirements.txt
-cp .env.template .env  # Configure your environment (if template exists)
 python3 manage.py migrate
 cd ../..
 ```
 
-**Alternative: Using npm script:**
-```bash
-npm run setup --workspace=backend
-```
+> **Note:** The `npm install` command automatically runs `postinstall` which installs Python dependencies for the backend using `pip3 install -r requirements.txt`.
 
 ### Development
 
@@ -208,9 +209,52 @@ npm run test:ui
 
 ## Deployment
 
-- **Frontend**: Deployed on Vercel
-- **Backend**: Deployed on Render
-- **Database**: Neon PostgreSQL
+### Full-Stack Deployment on Vercel
+
+This project is configured for full-stack deployment on Vercel, running both the Next.js frontend and Django backend:
+
+#### Architecture
+- **Frontend**: Next.js app served from `/`
+- **Backend**: Django API served from `/api/*`
+- **Database**: SQLite (development) or PostgreSQL (production)
+
+#### Configuration Files
+- `vercel.json`: Deployment configuration
+- `requirements.txt`: Python dependencies for Vercel
+- `apps/backend/vercel_app.py`: WSGI entry point
+- `apps/backend/culturalite_backend/vercel_settings.py`: Production settings
+
+#### Environment Variables (Set in Vercel Dashboard)
+```bash
+SECRET_KEY=your-secret-key-here
+DEBUG=False
+ALLOWED_HOSTS=your-domain.vercel.app
+```
+
+#### API Routes
+- Frontend: `https://your-app.vercel.app/`
+- Backend API: `https://your-app.vercel.app/api/`
+
+### Alternative: Separate Deployments
+
+If you prefer to deploy separately:
+
+#### Frontend Only (Vercel)
+```bash
+# Update vercel.json to only build frontend
+turbo build --filter=frontend
+```
+
+#### Backend Only (Railway/Render)
+```bash
+# Deploy backend separately
+npm run build:production --workspace=backend
+```
+
+### Database Options
+
+- **Development**: SQLite (included)
+- **Production**: PostgreSQL (Neon, Supabase, PlanetScale)
 
 ## Environment Setup
 

@@ -1,0 +1,30 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "apps/frontend/package.json",
+      "use": "@vercel/next"
+    },
+    {
+      "src": "apps/backend/vercel_app.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "apps/backend/vercel_app.py"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "apps/frontend/$1"
+    }
+  ],
+  "env": {
+    "DJANGO_SETTINGS_MODULE": "culturalite_backend.vercel_settings",
+    "SECRET_KEY": "@secret_key",
+    "DEBUG": "False"
+  },
+  "buildCommand": "npm install && turbo build",
+  "installCommand": "npm install"
+}

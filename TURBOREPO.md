@@ -54,12 +54,14 @@ The `turbo.json` file defines task pipelines with dependencies, inputs, and outp
 ### Starting Development
 
 ```bash
-# Install all dependencies
+# Install all dependencies (Node.js + Python automatically)
 npm install
 
 # Start all development servers
 npm run dev
 ```
+
+> **Automatic Setup:** The `npm install` command automatically installs Python dependencies for the Django backend via the `postinstall` script.
 
 This will start:
 - Frontend on http://localhost:3000

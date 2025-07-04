@@ -1,0 +1,3 @@
+# This file is for Vercel deployment
+# It points to the actual requirements in the backend
+-r apps/backend/requirements.txt

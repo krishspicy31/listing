@@ -5,7 +5,8 @@
   "private": true,
   "scripts": {
     "dev": "python3 manage.py runserver",
-    "build": "python3 manage.py collectstatic --noinput",
+    "build": "python3 manage.py collectstatic --noinput --settings=culturalite_backend.vercel_settings",
+    "build:production": "python3 manage.py collectstatic --noinput",
     "test": "python3 manage.py test tests",
     "test:coverage": "coverage run --source='.' manage.py test tests && coverage report",
     "lint": "flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics",

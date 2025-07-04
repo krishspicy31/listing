@@ -63,6 +63,9 @@ playwright-report/
 ehthumbs.db
 Thumbs.db
 
+# Deployment
+.vercel
+
 # Project specific
 /.bmad-core
 /docs
