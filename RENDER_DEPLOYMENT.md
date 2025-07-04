@@ -51,12 +51,14 @@ This guide will help you deploy the Culturalite application on Render using the 
    ```
    PYTHON_VERSION=3.12.0
    DJANGO_SETTINGS_MODULE=culturalite_backend.settings
-   SECRET_KEY=your-secret-key-here
+   SECRET_KEY=your-secret-key-here (or use "Generate Value" in Render)
    DEBUG=False
    ALLOWED_HOSTS=your-backend-url.onrender.com,localhost,127.0.0.1
    CORS_ALLOWED_ORIGINS=https://your-frontend-url.onrender.com,http://localhost:3000
    DATABASE_URL=postgresql://user:password@host:port/database
    ```
+
+   **Important**: Set the `SECRET_KEY` environment variable in Render before deploying. You can use Render's "Generate Value" feature for this.
 
 #### Database
 
@@ -101,7 +103,13 @@ The backend is configured to accept requests from:
 
 ### Common Issues
 
-1. **Build Failures:**
+1. **SECRET_KEY Error During Build:**
+   ```
+   UndefinedValueError: SECRET_KEY not found
+   ```
+   **Solution**: The settings.py now includes a fallback SECRET_KEY for build time. If you still see this error, ensure you're using the updated settings.py file.
+
+2. **Build Failures:**
    - Check that all dependencies are listed in requirements.txt
    - Verify Python version compatibility
    - Ensure environment variables are set

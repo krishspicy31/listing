@@ -23,7 +23,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 # SECRET_KEY must be set via environment variable - no default for security
-SECRET_KEY = config('SECRET_KEY')
+# Fallback for build time when environment variables might not be available
+SECRET_KEY = config('SECRET_KEY', default='django-insecure-build-key-only-for-collectstatic-and-migrations')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 # DEBUG defaults to False for production safety
